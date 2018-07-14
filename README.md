@@ -1,31 +1,31 @@
-### Especificacao de Protocolo
-*Protocolo de comunicação Serial Posijet 1*
 
-
-# Protocolo I de Comunicação
+## Protocolo I de Comunicação
 
 
 Este Controlador possui duas portas seriais de comunicação, a serial 1 e a serial 2. A diferença entre elas é que a serial 1 pode ser configurada para se comunicar com a impressora através dos parâmetros ”Reversão de mensagem via serial” e “Seleção de mensagem via serial“ do menu de “Configuração da impressora“, se um desses parâmetros estiver ligado, o protocolo descrito aqui só poderá ser usado com a serial 2 a 2400Bauds, sendo que a serial 1 poderá trabalhar a 2400, 4800 e 9600 Bauds.
 
 
-Parâmetros de Comunicação
+### Parâmetros de Comunicação
 
 Toda a comunicação realizada com o Movimentador Linear deve obedecer as seguintes condições descritas abaixo.
 
+```
 Tipo de Comunicação: Serial RS232C
 Taxa de Transferência: Serial 1 = 9600/bauds, Serial 2 = 2400/bauds
 Tamanho dos Dados: 8 bits
 Paridade: Nenhuma
 Delimitadores: 1 start bit e 1 stop bits
+```
 
+### Pacotes de Comunicação
 
-Pacotes de Comunicação
+O movimentador pode ser encarado como um dispositivo escravo, pois ele apenas pode enviar uma informação caso haja a solicitação da mesma.	
+	
+Todas as comunicações são iniciadas pelo dispositivo mestre, sendo que a comunicação é efetuada através de blocos, que também chamamos de pacote.
 
-	O movimentador pode ser encarado como um dispositivo escravo, pois ele apenas pode enviar uma informação caso haja a solicitação da mesma.	
-	Todas as comunicações são iniciadas pelo dispositivo mestre, sendo que a comunicação é efetuada através de blocos, que também chamamos de pacote.
-
-	Após o dispositivo mestre enviar um pacote ele deve aguardar o dispositivo escravo enviar um pacote de resposta, este pacote pode conter o dado solicitado, pode confirmar que os dados foram aceito ou indicar que houve um erro.
-	Todos os pacotes obedecem a estrutura abaixo.
+Após o dispositivo mestre enviar um pacote ele deve aguardar o dispositivo escravo enviar um pacote de resposta, este pacote pode conter o dado solicitado, pode confirmar que os dados foram aceito ou indicar que houve um erro.
+	
+Todos os pacotes obedecem a estrutura abaixo.
 
 ```
 +--------------------------------------------------------------------------------------------------------------+
@@ -84,10 +84,13 @@ Operação OR entre a posição de memória e a mascara. |
 (Operação OR entre a memória e a mascara)|
 
 O numero de canais é utilizado em sistema onde temos vários controladores conectado na mesma porta serial, cada controlador possui canal distinto, e este só interpretará e responderá ao pacotes em que o numero do canal coincidir ou for zero.
+
 Um numero de canal zero enviado pelo mestre será atendido por qualquer controlador independente do seu numero de canal. O canal zero só pode ser usado pelo mestre quando só tiver um único controlador conectado na porta serial, caso contrario todos responderiam simultaneamente.
+
 Um controlador com canal zero não poderá estar conectado em uma porta serial com outros controladores, pois atendera a todos pacotes recebido, e sua resposta entrará em conflito com os outro. 
-	O numero do canal do controlador pode ser modificado como será descrito adiante, e se for zero responderá a todos os pacotes de comunicação, desta forma podemos se comunicar com um controlador qualquer sem termos necessidade de conhecer seu numero.
-	Utiliza-se mascará para definir o conjunto de bits que se deseja zerar ou setar no controlador, pois o parâmetro alvo é um conjunto de bits e não bytes.
+
+O numero do canal do controlador pode ser modificado como será descrito adiante, e se for zero responderá a todos os pacotes de comunicação, desta forma podemos se comunicar com um controlador qualquer sem termos necessidade de conhecer seu numero.
+Utiliza-se mascará para definir o conjunto de bits que se deseja zerar ou setar no controlador, pois o parâmetro alvo é um conjunto de bits e não bytes.
  
 #### CMD
 Indica a posição da memória do microcontrolador dos dados solicitados ou enviados. O CMD sendo de um byte e o dados de 2 bytes, se pode acessar 512 posições de memória, mas apenas algumas delas tem significado para o usuário, e algumas posição nem podem ser modificada, pois são de uso do sistema.
@@ -241,25 +244,25 @@ O byte de start for Nack (15h)
 
 |Cod.	|Erro|
 | :---: | :--- |
-|01	Start byte invalido (stx)|
-|02	Estrutura do pacote de comunicação invalido|
-|03	Estrutura do pacote de comunicação invalido|
-|04	Estrutura do pacote de comunicação invalido|
-|05	Estrutura do pacote de comunicação invalido|
-|06	Estrutura do pacote de comunicação invalido|
-|07	Estrutura do pacote de comunicação invalido|
-|08	Estrutura do pacote de comunicação invalido|
-|09	Estrutura do pacote de comunicação invalido|
-|10	Não usado|
-|11	End byte invalido (etx)|
-|12	Timer in|
-|13	Não usado|
-|14	Framming|
-|15	Over run|
-|16	Buffer de recepção cheio|
-|17	CheqSum|
-|18	Buffer auxiliar ocupado|
-|19	Seqüência de byte enviada muito grande|
+|01	|Start byte invalido (stx)|
+|02	|Estrutura do pacote de comunicação invalido|
+|03	|Estrutura do pacote de comunicação invalido|
+|04	|Estrutura do pacote de comunicação invalido|
+|05	|Estrutura do pacote de comunicação invalido|
+|06	|Estrutura do pacote de comunicação invalido|
+|07	|Estrutura do pacote de comunicação invalido|
+|08	|Estrutura do pacote de comunicação invalido|
+|09	|Estrutura do pacote de comunicação invalido|
+|10	|Não usado|
+|11	|End byte invalido (etx)|
+|12	|Timer in|
+|13	|Não usado|
+|14	|Framming|
+|15	|Over run|
+|16	|Buffer de recepção cheio|
+|17	|CheqSum|
+|18	|Buffer auxiliar ocupado|
+|19	|Seqüência de byte enviada muito grande|
 
 #### StatusL e statusH
 
@@ -286,7 +289,7 @@ Sendo que unidade de comprimento será milímetro e a unidade de tempo será seg
 |87	|57	|Posição da primeira impressão no avanço|	Mm	|4,92125	|512|
 |88	|58	|Posição da primeira impressão no retorno|	Mm	|4,92125	|512|
 |89	|59	|Posição da ultima impressão no avanço|	Mm	|4,92125|	512|
-|90	|5ª	|Posição da ultima impressão no retorno|	|Mm	|4,92125	|512|
+|90	|5ª	|Posição da ultima impressão no retorno|Mm	|4,92125	|512|
 |91	|5B	|Largura do sinal de impressão|	S	|1024	|0|
 |92	|5C	|Tempo para start automático|	S	|1024	|0|
 |93	|5D	|Tempo para start externo|	S	|1024	|0|
@@ -302,18 +305,21 @@ Sendo que unidade de comprimento será milímetro e a unidade de tempo será seg
 
 Caso se deseje enviar um parâmetro ao controlador teremos que converter o valor ser enviado utilizando a tabela acima conforme a formula abaixo:
 
+```
 Valor a ser enviado = (Parâmetro) * (Fator de conversão) + (Valor a ser somado)
+```
 
 E na solicitação dos parâmetros devemos utilizar a formula abaixo
 
+```
 Parâmetro = [(Valor recebido) – (Valor a ser somado)] / (Fator de Conversão)
+```
 
-Obs.: O parâmetro deverá estar nas unidades mencionada na tabela acima e o dispositivo mecânico devera ser padrão.
+> Obs.: O parâmetro deverá estar nas unidades mencionada na tabela acima e o dispositivo mecânico devera ser padrão.
 
-Caso o equipamento não seja padrão temos a tabela abaixo para o calculo do fatore de “multiplicação / divisão”, sendo o valor a ser “somado / subtraído” o mesmo.
+Caso o equipamento não seja padrão temos a tabela abaixo para o calculo do fatore de **multiplicação / divisão**, sendo o valor a ser **somado / subtraído** o mesmo.
 
-|Unidade desejada de trabalho	|Unidade de trabalho do controlador	
-|Formula para o calculo do fator	|Fatores mais usuais
+|Unidade desejada de trabalho	|Unidade de trabalho do controlador	|Formula para o calculo do fator	|Fatores mais usuais|
 | :--- | :--- | :---: | :---: |
 |Milímetro	|Pulso	|2 * NPM / NDP / PC	|4,92125|
 |Milímetro / Segundo|	Pulso / T	|1,024 * 2 * NPM / NDP / PC  	|5,03937|
@@ -321,7 +327,7 @@ Caso o equipamento não seja padrão temos a tabela abaixo para o calculo do fat
 |Segundo	|1/1024 T|	1024	|1024|
 
 |Variável	|Descrição	|Valor para um equipamento padrão|
-| :---: | :---: | :--- |
+| :---: | :--- | :---| 
 |NPM	|Numero de pulso do Motor|	200|
 |NDP	|Numero de dente da Polia Motora	|16|
 |PC	|Passo da correia dentada	|5,08 mm|
@@ -340,8 +346,7 @@ Caso o equipamento não seja padrão temos a tabela abaixo para o calculo do fat
 |7	|Referencia pelo start esterno	|Ligado	|Desligado|
 |8	|Lógica do sinal de impressão	|Aberto	|Fechado|
 |9	|Lógica do sinal de reversão	|Aberto|	Fechado|
-|10	|Seleção de mensagem via serial 
-(Modo continuo/passo a passo)|	Ligado	|Desligado|
+|10	|Seleção de mensagem via serial (Modo continuo/passo a passo)|	Ligado	|Desligado|
 |11	|Reversão de mensagem via serial (Sem uso)	|Ligado|	Desligado|
 |12	|Giro com função de proteção	|Ligado	|Desligado|
 |13	|Giro com função de correção	|Ligado	|Desligado|
@@ -351,12 +356,15 @@ Caso o equipamento não seja padrão temos a tabela abaixo para o calculo do fat
 
 ## Algumas Variáveis importantes
 
-#### Status ( CMD = 49 =31h )
-O status é uma variável em que cada bit tem um significado próprio e só pode ser lida, caso seja feito uma escrita nesta variável o resultados do movimento serão imprevisíveis.
+#### `Status` ( CMD = 49 =31h )
+O `status` é uma variável em que cada bit tem um significado próprio e só pode ser lida, caso seja feito uma escrita nesta variável o resultados do movimento serão imprevisíveis.
+
 O status é enviado no pacote de resposta sempre que:
--	O byte de start for Nack (15h) teremos StatusL no primeiro byte
--	O byte de start for Ack (06h) e o pacote transmitido for de envio, reset ou set, teremos statusL no primeiro byte e statusH no segundo byte.
--	Quando for solicitado através do CMD=49 teremos statusL no primeiro byte e statusH no segundo byte. 
+
+- O byte de start for `Nack` (15h) teremos `StatusL` no primeiro byte
+- O byte de start for `Ack` (06h) e o pacote transmitido for de envio, reset ou set, teremos `statusL` no primeiro byte e `statusH` no segundo byte.
+
+- Quando for solicitado através do `CMD`=49 teremos `statusL` no primeiro byte e `statusH` no segundo byte. 
 
 |Bit	|Descrição|
 |:---:|:---|
@@ -392,14 +400,14 @@ O status é enviado no pacote de resposta sempre que:
 
 |Bit	|Descrição|
 |:---:|:---|
-|0	Start|
-|1	Stop|
-|2	Pausa|
-|3	Modo manual|
-|4	Teste de impressão|
-|5	Reservado para aplicações especiais|
-|6	Salva os parâmetro na EEprom|
-|7	Reservado|
-|8 a 15	Estão reservados para aplicações especiais.|
+|0	|Start|
+|1	|Stop|
+|2	|Pausa|
+|3	|Modo manual|
+|4	|Teste de impressão|
+|5	|Reservado para aplicações especiais|
+|6	|Salva os parâmetro na EEprom|
+|7	|Reservado|
+|8 a 15	|Estão reservados para aplicações especiais.|
 
 
