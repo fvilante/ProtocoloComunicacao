@@ -2,20 +2,21 @@
 ## Protocolo I de Comunicação
 
 
-Este Controlador possui duas portas seriais de comunicação, a serial 1 e a serial 2. A diferença entre elas é que a serial 1 pode ser configurada para se comunicar com a impressora através dos parâmetros ”Reversão de mensagem via serial” e “Seleção de mensagem via serial“ do menu de “Configuração da impressora“, se um desses parâmetros estiver ligado, o protocolo descrito aqui só poderá ser usado com a serial 2 a 2400Bauds, sendo que a serial 1 poderá trabalhar a 2400, 4800 e 9600 Bauds.
+Este Controlador possui duas portas seriais de comunicação, a *serial 1* e a *serial 2*. A diferença entre elas é que a *serial 1* pode ser configurada para se comunicar com a impressora através dos parâmetros `Reversão de mensagem via serial` e `Seleção de mensagem via serial` do menu de *Configuração da impressora*, se um desses parâmetros estiver ligado, o protocolo descrito aqui só poderá ser usado com a serial 2 a 2.400 Bauds, sendo que a serial 1 poderá trabalhar a 2.400, 4.800 e 9.600 Bauds.
 
 
 ### Parâmetros de Comunicação
 
 Toda a comunicação realizada com o Movimentador Linear deve obedecer as seguintes condições descritas abaixo.
 
-```
-Tipo de Comunicação: Serial RS232C
-Taxa de Transferência: Serial 1 = 9600/bauds, Serial 2 = 2400/bauds
-Tamanho dos Dados: 8 bits
-Paridade: Nenhuma
-Delimitadores: 1 start bit e 1 stop bits
-```
+> |Parametro| Valor |
+> | --- | --- |
+> | **Tipo de Comunicação** | Serial RS232C|
+> | **Taxa de Transferência** | `Serial 1` = 9600/bauds, `Serial 2` = 2400/bauds|
+> | **Tamanho dos Dados** | 8 bits|
+> | **Paridade** | Nenhuma|
+> | **Delimitadores** | 1 start bit e 1 stop bits|
+
 
 ### Pacotes de Comunicação
 
@@ -28,36 +29,18 @@ Após o dispositivo mestre enviar um pacote ele deve aguardar o dispositivo escr
 Todos os pacotes obedecem a estrutura abaixo.
 
 ```
-+--------------------------------------------------------------------------------------------------------------+
-|                                             Pacote de Solicitacao                                            |
-+--------------------------------------------------------------------------------------------------------------+
-| ESC |       |            |      CMD      |         DadoL        |        DadoH        | ESC | ETX | CheckSum |
-|     | START |   DIRECAO  |               |                      |                     |     |     |          |
-|     |  BYTE |      E     |               |                      |                     |     |     |          |
-|     |       |    CANAL   |               |                      |                     |     |     |          |
-+-----+-------+------------+---------------+----------------------+---------------------+-----+-----+----------+
-| 1Bh |   02  |  De 0 a 3F |               |                      |                     | 1Bh | 03h |    ???   |
-|     |       |            |   Posicao do  |  Nao tem significado | Nao tem significado |     |     |          |
-|     |       |            | primeiro byte | mas deve ser enviado |    mas deve ser     |     |     |          |
-|     |       |            |   solicitado  |    qualquer coisa    |                     |     |     |          |
-|     |       |            |               |                      |       enviado       |     |     |          |
-|     |       |            |               |                      |    qualquer coisa   |     |     |          |
-+-----+-------+------------+---------------+----------------------+---------------------+-----+-----+----------+
-|                                               Pacote de Retorno                                              |
-+--------------------------------------------------------------------------------------------------------------+
-| 1Bh |       | De 0 a 3Fh |               |                                            | 1Bh | 03h |          |
-|     |  NACK |            |  Mesmo valor  |                Parametro de                |     |     |    ???   |
-|     |  15h  |            |    enviado    |                  2 bytes                   |     |     |          |
-|     |       |            |               |                                            |     |     |          |
-|     |       |            |               |                 solicitado                 |     |     |          |
-+-----+-------+------------+---------------+--------------------------------------------+-----+-----+----------+
-|                                                                                                              |
-|                                          Pacote de Retorno com Erro                                          |
-+--------------------------------------------------------------------------------------------------------------+
-| 1Bh |       | De 0 a 3Fh |   Indefinido  |     Byte de Erro     |       StatusL       | 1Bh | 03h |    ???   |
-|     |  Nack |            |               |                      |                     |     |     |          |
-|     |  15h  |            |               |                      |                     |     |     |          |
-+-----+-------+------------+---------------+----------------------+---------------------+-----+-----+----------+
++------------------------------------------------------------------------------+
+|                                 Pacote Padrao                                |
++------------------------------------------------------------------------------+
+| ESC |       |         |      CMD      | DadoL | DadoH | ESC | ETX | CheckSum |
+|     | START | DIRECAO |               |       |       |     |     |          |
+|     |  BYTE |    E    |               |       |       |     |     |          |
+|     |       |  CANAL  |               |       |       |     |     |          |
++-----+-------+---------+---------------+-------+-------+-----+-----+----------+
+|     |   02  |         |   Posicao do  |   Informacao  |     |     |          |
+| 1Bh |   06  |         | primeiro byte |               | 1Bh | 03h |          |
+|     |   21  |   ???   |               |               |     |     |    ???   |
++-----+-------+---------+---------------+---------------+-----+-----+----------+
 							
 ```
 #### Start byte: 
@@ -76,12 +59,9 @@ Adotando este byte como um numero binário ddccccccb onde dd indica as quatro fo
 |Binário	|Hexadecimal	|Função|
 | :---: | :---: | :--- |
 |00CCCCCC|	00h a 3Fh	|Define que esta solicitando uma informação e o pacote de retorno deverá conter a informação solicitada.|
-|01CCCCCC|	40h a 7Fh	|Define que a informação enviada é uma mascara para resetar os bits a partir da posição fornecida.
-(Operação AND entre a posição da memória e a mascara negada)|
-|10CCCCCC|	80h a Bfh	|Define que a informação enviada é uma mascará para setar os bits a partir da posição fornecida.
-Operação OR entre a posição de memória e a mascara. |
-|11CCCCCC|	C0h a FFh	|Define que a informação enviada será carregada a partir da posição fornecida.
-(Operação OR entre a memória e a mascara)|
+|01CCCCCC|	40h a 7Fh	|Define que a informação enviada é uma mascara para resetar os bits a partir da posição fornecida.(Operação AND entre a posição da memória e a mascara negada)|
+|10CCCCCC|	80h a Bfh	|Define que a informação enviada é uma mascará para setar os bits a partir da posição fornecida. Operação OR entre a posição de memória e a mascara. |
+|11CCCCCC|	C0h a FFh	|Define que a informação enviada será carregada a partir da posição fornecida. (Operação OR entre a memória e a mascara)|
 
 O numero de canais é utilizado em sistema onde temos vários controladores conectado na mesma porta serial, cada controlador possui canal distinto, e este só interpretará e responderá ao pacotes em que o numero do canal coincidir ou for zero.
 
